@@ -7,22 +7,22 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @MessagePattern('createOrder')
+  @MessagePattern({ cmd: 'create_order' })
   create(@Payload() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
   }
 
-  @MessagePattern('findAllOrders')
+  @MessagePattern({ cmd: 'find_all_orders' })
   findAll() {
     return this.ordersService.findAll();
   }
 
-  @MessagePattern('findOneOrder')
-  findOne(@Payload() id: number) {
+  @MessagePattern({ cmd: 'find_one_order' })
+  findOne(@Payload('id') id: number) {
     return this.ordersService.findOne(id);
   }
 
-  @MessagePattern('changeOrderStatus')
+  @MessagePattern({ cmd: 'change_order_status' })
   changeOrderStatus() {
     // return this.ordersService.changeStatus()
     throw new NotImplementedException();
