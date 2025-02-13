@@ -92,18 +92,6 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
         message: "Check logs",
       });
     }
-
-    /*
-    return {
-      service: "Orders Microservice",
-      createOrderDto: createOrderDto,
-    };
-    */
-    /*
-    return this.order.create({
-      data: createOrderDto,
-    });
-    */
   }
 
   async findAll(orderPaginationDto: OrderPaginationDto) {
@@ -135,6 +123,15 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
       where: {
         id,
       },
+      include: {
+        OrderItem: {
+          select: {
+            price: true,
+            quantity: true,
+            productId: true,
+          },
+        },
+      },
     });
     if (!order) {
       throw new RpcException({
@@ -142,7 +139,20 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
         message: `Order with id ${id} not found`,
       });
     }
-    return order;
+
+    const productsId = order.OrderItem.map((orderItem) => orderItem.productId);
+    const products: any[] = await firstValueFrom(
+      this.productsClient.send({ cmd: "validate_products" }, productsId),
+    );
+
+    return {
+      ...order,
+      OrderItem: order.OrderItem.map((orderItem) => ({
+        ...orderItem,
+        name: products.find((product) => product.id === orderItem.productId)
+          .name,
+      })),
+    };
   }
 
   async changeStatus(changeOrderStatusDto: ChangeOrderStatusDto) {
