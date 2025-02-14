@@ -10,7 +10,11 @@
 2. Install dependencies
 3. Create `.env` file based on `env.example`
 4. Exec prisma migration `npx prisma migrate dev`
-5. ```
-   docker compose up -d
-   ```
-6. Exec `npm run start:dev`
+5. Have launched database with `docker compose up -d`
+6. Have launched NATS server
+
+```
+docker run -d --name nats-server -p 4222:4222 -p 8222:8222 nats
+```
+
+7. Exec `npm run start:dev`
